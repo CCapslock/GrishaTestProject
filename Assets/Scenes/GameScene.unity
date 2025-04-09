@@ -753,7 +753,7 @@ Transform:
   m_GameObject: {fileID: 939064844}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -7}
+  m_LocalPosition: {x: 2.95, y: 0, z: -0.97}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1278,6 +1278,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 220040523053020729, guid: f100fb7785b6511418ac4fec902c5270, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 51ff177b67c3bcf48a86b8716db52ca3, type: 2}
     - target: {fileID: 3093157076361033422, guid: f100fb7785b6511418ac4fec902c5270, type: 3}
       propertyPath: _stackAble
       value: 1
@@ -1392,7 +1396,7 @@ MonoBehaviour:
     m_Bits: 128
   _objectMovementSpeed: 10
   _objectSeeDistance: 3
-  _pickUpDistance: 3
+  _pickUpDistance: 4
   _stackMaxHieght: 5
   _calculatedPlacedPosition: {x: 0, y: 0, z: 0}
   _itemPickedUp: 0

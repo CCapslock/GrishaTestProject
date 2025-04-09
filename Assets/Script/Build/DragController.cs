@@ -13,30 +13,37 @@ public class DragController : MonoBehaviour
     private RaycastHit _hit;
     private DragAbleObject _raycastedDragAbleObject;
     private DragAbleObject _currentDragableObject;
+    private DragAbleObject _stackableObject;
     private Vector3 _startPosition;
     private Vector3 _calculatedPosition = new Vector3();
     private Vector3 _calculatedRaycastStartPosition = new Vector3();
-    [SerializeField] private Vector3 _calculatedPlacedPosition = new Vector3();
+    private Vector3 _calculatedPlacedPosition = new Vector3();
     private float _distanceToFloor;
-    [SerializeField] private bool _itemPickedUp;
-    [SerializeField] private bool _isCameraSeeFloor;
-    [SerializeField] private bool _itemSelected;
-    [SerializeField] private bool _hasPlacedPosition;
-    [SerializeField] private bool _isPositionStackObject;
+    private int _collidedObjectsAmount;
+    private bool _itemPickedUp;
+    private bool _isCameraSeeFloor;
+    private bool _itemSelected;
+    private bool _hasPlacedPosition;
+    private bool _canBePlaced;
+    private bool _isPositionStackObject;
+
     private void Update()
     {
         if (_itemPickedUp)
         {
             CalculateCameraDistanceToFloor();
+            _hasPlacedPosition = false;
+            if (_isCameraSeeFloor)
+            {
+                CheckForFloor();
 
-            CheckForFloor();
-
+            }
             if (_currentDragableObject.IsStackAble)
             {
                 CheckForStackAbleObject();
             }
-
             MoveDragableItem();
+            CheckIfCanPlace();
         }
         else
         {
@@ -58,25 +65,10 @@ public class DragController : MonoBehaviour
 
         }
     }
-    private void CheckForStackAbleObject()
-    {
-            _calculatedRaycastStartPosition = _playerCamera.position + _playerCamera.forward * _pickUpDistance;
-        _calculatedRaycastStartPosition.y = _stackMaxHieght;
-
-        RaycastHit hit;
-        Ray ray = new Ray(_calculatedRaycastStartPosition, Vector3.down);
-
-        if (Physics.Raycast(ray, out hit, _stackMaxHieght + 1f, _stackAbleObjectLayer))
-        {
-            _hasPlacedPosition = true;
-            _isPositionStackObject = true;
-            _calculatedPlacedPosition = hit.point;
-        }
-    }
     private void CheckForFloor()
     {
-        _calculatedRaycastStartPosition = _playerCamera.position + _playerCamera.forward * _pickUpDistance; 
-        
+        _calculatedRaycastStartPosition = _playerCamera.position + _playerCamera.forward * _distanceToFloor;
+
         _calculatedRaycastStartPosition.y = _stackMaxHieght;
 
         RaycastHit hit;
@@ -88,13 +80,54 @@ public class DragController : MonoBehaviour
             _calculatedPlacedPosition = hit.point;
         }
     }
+    private void CheckForStackAbleObject()
+    {
+        if (_isCameraSeeFloor)
+        {
+            _calculatedRaycastStartPosition = _playerCamera.position + _playerCamera.forward * _distanceToFloor;
+        }
+        else
+        {
+            _calculatedRaycastStartPosition = _playerCamera.position + _playerCamera.forward * _pickUpDistance;
+
+        }
+        _calculatedRaycastStartPosition.y = _stackMaxHieght;
+
+        RaycastHit hit;
+        Ray ray = new Ray(_calculatedRaycastStartPosition, Vector3.down);
+
+        if (Physics.Raycast(ray, out hit, _stackMaxHieght + 1f, _stackAbleObjectLayer))
+        {
+            if (hit.collider.TryGetComponent(out _stackableObject))
+            {
+                if (_stackableObject.IsStackAble)
+                {
+                    _hasPlacedPosition = true;
+                    _isPositionStackObject = true;
+                    _calculatedPlacedPosition = hit.point;
+                }
+            }
+        }
+    }
     private void MoveDragableItem()
     {
-        //if (!_isCameraSeeFloor)
-        //{
-        //    _calculatedPosition = _playerCamera.position + _playerCamera.forward * _pickUpDistance;
-        //}
+        if (!_hasPlacedPosition)
+        {
+            _calculatedPlacedPosition = _playerCamera.position + _playerCamera.forward * _pickUpDistance;
+        }
         _currentDragableObject.transform.position = _calculatedPlacedPosition;
+    }
+    private void CheckIfCanPlace()
+    {
+        if (_collidedObjectsAmount <= 0 && _hasPlacedPosition)
+        {
+            _canBePlaced = true;
+        }
+        else
+        {
+            _canBePlaced = false;
+        }
+        _currentDragableObject.SetPlaceAbleState(_canBePlaced);
     }
     public void PickUpItem(DragAbleObject dragableObject)
     {
@@ -103,6 +136,7 @@ public class DragController : MonoBehaviour
             _currentDragableObject = dragableObject;
             _currentDragableObject.PickUpObject();
             _startPosition = _currentDragableObject.transform.position;
+            SubscribeToObjectActions();
             _itemPickedUp = true;
         }
     }
@@ -112,6 +146,7 @@ public class DragController : MonoBehaviour
         {
             _itemPickedUp = false;
             _currentDragableObject.transform.position = _startPosition;
+            ClearSubscriptions();
             _currentDragableObject.ReleaseObject();
         }
     }
@@ -119,7 +154,7 @@ public class DragController : MonoBehaviour
     {
         if (_itemPickedUp)
         {
-            if (_hasPlacedPosition)
+            if (_canBePlaced)
             {
                 PlaceItem();
             }
@@ -137,6 +172,25 @@ public class DragController : MonoBehaviour
         _itemPickedUp = false;
         _currentDragableObject.transform.position = _calculatedPlacedPosition;
         _currentDragableObject.ReleaseObject();
+    }
+    private void SubscribeToObjectActions()
+    {
+        _currentDragableObject.onTriggerEnter += AddCollidedObject;
+        _currentDragableObject.onTriggerExit += RemoveCollidedObject;
+    }
+    private void ClearSubscriptions()
+    {
+        _currentDragableObject.onTriggerEnter -= AddCollidedObject;
+        _currentDragableObject.onTriggerExit -= RemoveCollidedObject;
+        _collidedObjectsAmount = 0;
+    }
+    private void AddCollidedObject()
+    {
+        _collidedObjectsAmount++;
+    }
+    private void RemoveCollidedObject()
+    {
+        _collidedObjectsAmount--;
     }
     private void CheckForItems()
     {

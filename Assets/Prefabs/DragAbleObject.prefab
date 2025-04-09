@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 51ff177b67c3bcf48a86b8716db52ca3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -111,6 +111,7 @@ GameObject:
   - component: {fileID: 3093157076361033422}
   - component: {fileID: 1532762278887107294}
   - component: {fileID: 3769450436464401714}
+  - component: {fileID: 3087871004022580623}
   m_Layer: 7
   m_Name: DragAbleObject
   m_TagString: Untagged
@@ -148,6 +149,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _outlinable: {fileID: 3769450436464401714}
   _collider: {fileID: 1532762278887107294}
+  _renderer: {fileID: 220040523053020729}
+  _greenTransparentMaterial: {fileID: 2100000, guid: 9b78bec2140bad94ea314efc47fecf9d, type: 2}
+  _redTransparentMaterial: {fileID: 2100000, guid: 034f74df22575414cb9313839d11b0d3, type: 2}
+  _dragAbleObjectLayer: 7
+  _defaultLayer: 0
   _stackAble: 1
 --- !u!65 &1532762278887107294
 BoxCollider:
@@ -264,6 +270,33 @@ MonoBehaviour:
     fillPass:
       shader: {fileID: 0}
       serializedProperties: []
+--- !u!54 &3087871004022580623
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4876504692112415609}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &7576185742646487786
 GameObject:
   m_ObjectHideFlags: 0
