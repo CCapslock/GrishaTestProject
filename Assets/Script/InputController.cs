@@ -11,8 +11,6 @@ public class InputController : MonoBehaviour
 
 
     private Transform _cameraTransform;
-    private Renderer _selectedItemRenderer;
-    private DragAbleObject _dragAbleObject;
     private Vector3 _cameraRotationVector;
     private Vector3 _playerRotationVector;
     private float _xRotation;
@@ -20,7 +18,6 @@ public class InputController : MonoBehaviour
     private float _mouseY;
     private float _movementX;
     private float _movementZ;
-    private bool _itemSelected;
     private bool _isGameStarted;
     private void Start()
     {
@@ -48,7 +45,6 @@ public class InputController : MonoBehaviour
             TakeMouseInput();
             TakeMovementVector();
             CheckForMouseInput();
-            CheckForItems();
 
             _playerMovement.CameraLook(_cameraRotationVector, _playerRotationVector);
             _playerMovement.MovePlayer(_movementX, _movementZ);
@@ -74,53 +70,13 @@ public class InputController : MonoBehaviour
     }
     private void CheckForMouseInput()
     {
-        RaycastHit hit;
-        Ray ray = new Ray(_cameraTransform.position, _cameraTransform.forward);
         if (Input.GetMouseButtonDown(0))
         {
-
-            if (Physics.Raycast(ray, out hit, ObjectMaxDistance))
-            {
-                //if (hit.collider.try(TagManager.GetTag(TagType.DragAble)))
-                //{
-                //    _dragController.TakeItem(hit.transform);
-                //}
-
-            }
+            _dragController.TryLMBInput();
         }
         if (Input.GetMouseButtonDown(1))
         {
-            //_dragController.ThrowItem();
-        }
-        if (Input.GetMouseButtonUp(0))
-        {
-            if (Physics.Raycast(ray, out hit, ObjectMaxDistance))
-            {
-                //if (hit.collider.CompareTag(TagManager.GetTag(TagType.Baby)))
-                //{
-                //    _dragController.TryUseOnBaby();
-
-                //}
-                //else
-                //{
-                //    _dragController.ReleaseItem();
-                //}
-
-            }
-            else
-            {
-                //_dragController.ReleaseItem();
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            if (Physics.Raycast(ray, out hit, ObjectMaxDistance))
-            {
-                //if (hit.collider.CompareTag(TagManager.GetTag(TagType.Baby)))
-                //{
-                //    _dragController.TryUseOnBaby();
-                //}
-            }
+            _dragController.ReleaseObject();
         }
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
@@ -131,40 +87,5 @@ public class InputController : MonoBehaviour
 
             _playerMovement.StopCrawl();
         }
-    }
-    private void CheckForItems()
-    {
-        RaycastHit hit;
-        Ray ray = new Ray(_cameraTransform.position, _cameraTransform.forward);
-        if (Physics.Raycast(ray, out hit, ObjectMaxDistance))
-        {
-            if (hit.collider.TryGetComponent(out _dragAbleObject))
-            {
-
-            }
-
-
-
-
-            if (hit.collider.CompareTag(""))
-            {
-                if (!_itemSelected)
-                {
-                    _itemSelected = true;
-                    _dragAbleObject = hit.transform.GetComponent<DragAbleObject>();
-                    //_selectedItemRenderer = _dragAbleObject.ItemRenderer;
-                    //_selectedItemRenderer.sharedMaterial = _dragAbleObject.OutlinedMaterial;
-                }
-            }
-            else
-            {
-                if (_itemSelected)
-                {
-                    _itemSelected = false;
-                    //_selectedItemRenderer.sharedMaterial = _dragAbleObject.BasicMaterial;
-                }
-            }
-        }
-
     }
 }
