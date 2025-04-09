@@ -45,14 +45,12 @@ public class PlayerMovementController : MonoBehaviour
     public void MovePlayer(float xInput, float zInput)
     {
         _playerMovementVector = PlayerTransform.right * xInput + PlayerTransform.forward * zInput;
-        _playerVelocityVector.y += -9.81f * Time.deltaTime;
 
         if (_isCrawl)
             _characterController.Move(_playerMovementVector * CrawlSpeed * Time.deltaTime);
         else
             _characterController.Move(_playerMovementVector * Speed * Time.deltaTime);
 
-        _characterController.Move(_playerMovementVector * Time.deltaTime);
     }
     public void StartCrawl()
     {

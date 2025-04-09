@@ -13,6 +13,7 @@ public class InputController : MonoBehaviour
     private Transform _cameraTransform;
     private Vector3 _cameraRotationVector;
     private Vector3 _playerRotationVector;
+    private Vector2 _mouseScroll;
     private float _xRotation;
     private float _mouseX;
     private float _mouseY;
@@ -43,6 +44,7 @@ public class InputController : MonoBehaviour
         if (_isGameStarted)
         {
             TakeMouseInput();
+            TakeWheelInput();
             TakeMovementVector();
             CheckForMouseInput();
 
@@ -62,6 +64,14 @@ public class InputController : MonoBehaviour
         _playerRotationVector = Vector3.up * _mouseX;
 
     }
+    private void TakeWheelInput()
+    {
+
+        _mouseScroll = Input.mouseScrollDelta;
+
+        _dragController.TryRotateObject(_mouseScroll);
+
+    }
     private void TakeMovementVector()
     {
         _movementX = Input.GetAxis("Horizontal");
@@ -74,17 +84,12 @@ public class InputController : MonoBehaviour
         {
             _dragController.TryLMBInput();
         }
-        if (Input.GetMouseButtonDown(1))
-        {
-            _dragController.ReleaseObject();
-        }
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             _playerMovement.StartCrawl();
         }
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
-
             _playerMovement.StopCrawl();
         }
     }
