@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class InputController : MonoBehaviour
 {
-    [SerializeField] private float MouseSensitivity;
-    [SerializeField] private float ObjectMaxDistance;
+    [SerializeField] private float _mouseSensitivity;
 
 
     [SerializeField] private PlayerMovementController _playerMovement;
@@ -54,8 +53,8 @@ public class InputController : MonoBehaviour
     }
     private void TakeMouseInput()
     {
-        _mouseX = Input.GetAxis("Mouse X") * MouseSensitivity * Time.deltaTime;
-        _mouseY = Input.GetAxis("Mouse Y") * MouseSensitivity * Time.deltaTime;
+        _mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity * Time.deltaTime;
+        _mouseY = Input.GetAxis("Mouse Y") * _mouseSensitivity * Time.deltaTime;
 
         _xRotation -= _mouseY;
         _xRotation = Mathf.Clamp(_xRotation, -90f, 90f);
