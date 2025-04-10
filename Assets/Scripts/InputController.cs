@@ -3,11 +3,8 @@ using UnityEngine;
 public class InputController : MonoBehaviour
 {
     [SerializeField] private float _mouseSensitivity;
-
-
     [SerializeField] private PlayerMovementController _playerMovement;
     [SerializeField] private DragController _dragController;
-
 
     private Transform _cameraTransform;
     private Vector3 _cameraRotationVector;

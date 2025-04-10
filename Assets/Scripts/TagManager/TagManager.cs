@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 
-public static class TagManager
+public class TagManager
 {
-	private static readonly Dictionary<TagType, string> _tags;
+	public readonly Dictionary<TagType, string> _tags;
 
-	static TagManager()
+
+	public TagManager()
 	{
 		_tags = new Dictionary<TagType, string>
 			{
@@ -14,7 +15,7 @@ public static class TagManager
 			};
 	}
 
-	public static string GetTag(TagType tagType)
+	public string GetTag(TagType tagType)
 	{
 		return _tags[tagType];
 	}

@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ParticlesManager : MonoBehaviour
 {
-    [HideInInspector] public static ParticlesManager Current;
 
     [SerializeField] private SingleParticle[] _availableParticles;
     [SerializeField] private ParticleSystem[][] _particlesPool;
@@ -13,7 +12,6 @@ public class ParticlesManager : MonoBehaviour
     private Vector3 _poolRotationVector = new Vector3(0, 0, 0);
     private void Awake()
     {
-        Current = this;
         _parentTransform = new GameObject("ParticlesPool").transform;
         InitiateParticlePool();
     }

@@ -2,20 +2,15 @@ using EPOOutline;
 using NaughtyAttributes;
 using System;
 using UnityEngine;
+using Zenject;
 
+[RequireComponent(typeof(RenderDragableObject))]
 public abstract class DragableObject : MonoBehaviour
 {
-    [SerializeField] private Outlinable _outlinable;
     [SerializeField] private Collider _collider;
-    [SerializeField] private Renderer _renderer;
-    [SerializeField] private Material _greenTransparentMaterial;
-    [SerializeField] private Material _redTransparentMaterial;
-    [SerializeField] private Animator _animatorController;
     [SerializeField] protected LayerMask _floorLayer;
     [SerializeField] protected LayerMask _dragableObjectLayer;
     [SerializeField] protected LayerMask _wallLayer;
-    [SerializeField] private Color _outlineAvailableColor;
-    [SerializeField] private Color _outlineBlockedColor;
     [SerializeField] protected float _snapDistance;
     [SerializeField] protected float _snapDiffrence;
     [Layer]
@@ -25,21 +20,21 @@ public abstract class DragableObject : MonoBehaviour
     [SerializeField] protected bool _canBeStackedOn;
     [SerializeField] protected bool _canBeStacked;
 
+    private RenderDragableObject _objectRender;
+    private TagManager _tagManager;
     private Quaternion _goalObjectRotation;
     protected Vector3 _calculatedRaycastStartPosition = new Vector3();
     protected Vector3 _calculatedPlacedPosition = new Vector3();
     protected Vector3 _startPosition;
     protected DragableObject _collidedObject;
     protected DragableObject _bottomObject;
-    private Material _basicMaterial;
-    private int _collidedObjectsAmount;
     protected bool _hasBottomObject;
     protected bool _hasPlacedPosition;
-    private bool _isBlocked;
     protected bool _isPlayerIn;
+    private int _collidedObjectsAmount;
+    private bool _isBlocked;
     private bool _needToRotate;
     private bool _canBePlaced;
-    private string _popVerticalTrigger = "PopVertical";
 
     public bool IsPickedUp { get; private set; }
     public bool IsSelected { get; private set; }
@@ -51,12 +46,19 @@ public abstract class DragableObject : MonoBehaviour
 
     protected event Action onTriggerExitPlayer;
 
-
+    private void Awake()
+    {
+        _objectRender= GetComponent<RenderDragableObject>();
+    }
     private void Start()
     {
         SelectObject(false);
-        _basicMaterial = _renderer.sharedMaterial;
         onTriggerExitPlayer += SetCorrectColliderSettings;
+    }
+    [Inject]
+    private void Construct(TagManager tagManager, ParticlesManager particlesManager)
+    {
+        _tagManager = tagManager;
     }
     public virtual void DragObject(Transform cameraTransform, float distanceToPickUp)
     {
@@ -87,7 +89,7 @@ public abstract class DragableObject : MonoBehaviour
         _needToRotate = true;
         _goalObjectRotation = Quaternion.Euler(_goalObjectRotation.eulerAngles + (Vector3.up * (45f * scrollInput.y)));
     }
-    protected void MoveDragableItem(Transform cameraTransform,float distanceToPickUp)
+    protected void MoveDragableItem(Transform cameraTransform, float distanceToPickUp)
     {
         if (!_hasPlacedPosition)
         {
@@ -110,7 +112,7 @@ public abstract class DragableObject : MonoBehaviour
     public void SelectObject(bool state)
     {
         IsSelected = state;
-        _outlinable.enabled = state;
+        _objectRender.SelectObject(state);
     }
     public void PickUpObject()
     {
@@ -132,10 +134,8 @@ public abstract class DragableObject : MonoBehaviour
     }
     public void ReleaseObject()
     {
-        _animatorController.SetTrigger(_popVerticalTrigger);
-        ParticlesManager.Current.MakeParticles(ParticleType.PuffParticle, transform.position);
         gameObject.layer = _dragAbleObjectLayer;
-        _renderer.sharedMaterial = _basicMaterial;
+        _objectRender.ReleaseObject();
         if (!_isPlayerIn)
         {
             _collider.isTrigger = false;
@@ -151,29 +151,12 @@ public abstract class DragableObject : MonoBehaviour
     }
     public void SetPlaceAbleState(bool state)
     {
-        if (state)
-        {
-            _renderer.sharedMaterial = _greenTransparentMaterial;
-        }
-        else
-        {
-            _renderer.sharedMaterial = _redTransparentMaterial;
-        }
-
+        _objectRender.SetAvailabilityMaterial(state);
     }
     public void SetBlockedState(bool state)
     {
         _isBlocked = state;
-        if (state)
-        {
-            _outlinable.FrontParameters.Color = _outlineBlockedColor;
-            _outlinable.BackParameters.Color = _outlineBlockedColor;
-        }
-        else
-        {
-            _outlinable.FrontParameters.Color = _outlineAvailableColor;
-            _outlinable.BackParameters.Color = _outlineAvailableColor;
-        }
+        _objectRender.SetAvailabilityOutline(state);
     }
     private void SetCorrectColliderSettings()
     {
@@ -184,29 +167,29 @@ public abstract class DragableObject : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(TagManager.GetTag(TagType.DragableObject)) || other.CompareTag(TagManager.GetTag(TagType.Wall)))
+        if (other.CompareTag(_tagManager.GetTag(TagType.DragableObject)) || other.CompareTag(_tagManager.GetTag(TagType.Wall)))
         {
             _collidedObjectsAmount++;
         }
-        if (other.CompareTag(TagManager.GetTag(TagType.Player)))
+        if (other.CompareTag(_tagManager.GetTag(TagType.Player)))
         {
             _isPlayerIn = true;
         }
     }
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag(TagManager.GetTag(TagType.DragableObject)) || other.CompareTag(TagManager.GetTag(TagType.Wall)))
+        if (other.CompareTag(_tagManager.GetTag(TagType.DragableObject)) || other.CompareTag(_tagManager.GetTag(TagType.Wall)))
         {
             _collidedObjectsAmount--;
         }
-        if (other.CompareTag(TagManager.GetTag(TagType.Player)))
+        if (other.CompareTag(_tagManager.GetTag(TagType.Player)))
         {
             _isPlayerIn = false;
             onTriggerExitPlayer?.Invoke();
         }
     }
     public RaycastCheckResult CheckForObjectByLayer(Transform startTransform, LayerMask layer, float pickupDistance)
-    { 
+    {
         RaycastCheckResult result = new RaycastCheckResult();
         RaycastHit hit;
         Ray ray = new Ray(startTransform.position, startTransform.forward);

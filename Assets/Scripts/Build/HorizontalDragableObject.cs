@@ -6,7 +6,7 @@ public class HorizontalDragableObject : DragableObject
     private bool _isCameraSeeWall;
     public override void DragObject(Transform cameraTransform, float distanceToPickUp)
     {
-        CalculateCameraDistanceToWall(cameraTransform, distanceToPickUp);
+        SetCalculateCameraDistanceToWall(cameraTransform, distanceToPickUp);
         _hasPlacedPosition = false; 
         if (_isCameraSeeWall)
         {
@@ -23,7 +23,7 @@ public class HorizontalDragableObject : DragableObject
         MoveDragableItem(cameraTransform, distanceToPickUp);
         CheckIfCanPlace();
     }
-    private void CalculateCameraDistanceToWall(Transform cameraTransform, float distanceToPickUp)
+    private void SetCalculateCameraDistanceToWall(Transform cameraTransform, float distanceToPickUp)
     {
         RaycastCheckResult temp = CheckForObjectByLayer(cameraTransform,_wallLayer, distanceToPickUp);
 

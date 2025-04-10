@@ -8,7 +8,7 @@ public class VerticalDragableObject : DragableObject
     private bool _isCameraSeeDragableObject;
     public override void DragObject(Transform cameraTransform, float distanceToPickUp)
     {
-        CalculateCameraDistanceToFloor(cameraTransform, distanceToPickUp);
+        SetCameraDistanceToFloor(cameraTransform, distanceToPickUp);
         _hasPlacedPosition = false;
         if (_isCameraSeeFloor)
         {
@@ -16,7 +16,7 @@ public class VerticalDragableObject : DragableObject
         }
         if (CanStack)
         {
-            CalculateCameraDistanceToDragableObject(cameraTransform, distanceToPickUp);
+            SetCameraDistanceToDragableObject(cameraTransform, distanceToPickUp);
             if (_isCameraSeeDragableObject)
             {
                 CheckForStackAbleObject(cameraTransform, distanceToPickUp);
@@ -29,14 +29,14 @@ public class VerticalDragableObject : DragableObject
         MoveDragableItem(cameraTransform, distanceToPickUp);
         CheckIfCanPlace();
     }
-    private void CalculateCameraDistanceToFloor(Transform cameraTransform, float distanceToPickUp)
+    private void SetCameraDistanceToFloor(Transform cameraTransform, float distanceToPickUp)
     {
         RaycastCheckResult temp = CheckForObjectByLayer(cameraTransform, _floorLayer, distanceToPickUp);
 
         _isCameraSeeFloor = temp.HasObject;
         _distanceToFloor = temp.DistanceToObject;
     }
-    private void CalculateCameraDistanceToDragableObject(Transform cameraTransform, float distanceToPickUp)
+    private void SetCameraDistanceToDragableObject(Transform cameraTransform, float distanceToPickUp)
     {
         RaycastCheckResult temp = CheckForObjectByLayer(cameraTransform, _dragableObjectLayer, distanceToPickUp);
 

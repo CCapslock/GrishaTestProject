@@ -10,8 +10,7 @@ public class PlayerMovementController : MonoBehaviour
     [SerializeField] private float _crawlSpeed;
     [SerializeField] private float _cameraSpeedToCrawl;
 
-    private Vector3 _playerMovementVector;
-    private Vector3 _playerVelocityVector;
+    private Vector3 _playerMovementVector = new Vector3();
     private Vector3 _cameraStartPosition;
     private Vector3 _cameraDestanationPosition;
     private bool _needToMoveCamera;
@@ -20,8 +19,6 @@ public class PlayerMovementController : MonoBehaviour
 
     private void Start()
     {
-        _playerMovementVector = new Vector3();
-        _playerVelocityVector = new Vector3();
         _cameraStartPosition = _cameraTransform.localPosition;
     }
     private void FixedUpdate()
